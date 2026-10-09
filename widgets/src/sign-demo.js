@@ -4,6 +4,7 @@
 //
 //   CBF              signed in place, in JavaScript (sign.js)
 //   HDF5             signed in place by framesig running in the page (python.js)
+//   Zarr (zip)       signed in place by framesig running in the page (python.js)
 //   proprietary      converted to HyperSpy .hspy with rosettasciio, then signed in place
 //   anything else    a separate .framesig signature file
 //
@@ -15,20 +16,16 @@ import * as cbf from "../framesig/cbf.js";
 import { generateSigner, importSigner, signFile, SIDECAR_SUFFIX } from "../framesig/sign.js";
 import { verifyFrame } from "../framesig/verify.js";
 import {
-  ROOTS, ROOT_PEM, download, fileLoader, frameThumbnail, fromBase64String, h, mount, previewCanvas, resultCard,
+  ROOTS, ROOT_PEM, download, fileLoader, frameThumbnail, h, mount, previewCanvas, resultCard, sampleBytes,
   split, statusLine,
 } from "./common.js";
-import { CONVERTIBLE, extension, inScratch, isHdf5, python, pythonWithReaders } from "./python.js";
+import { CONVERTIBLE, extension, inScratch, isHdf5, isZip, python, pythonWithReaders } from "./python.js";
 import demoSigner from "../../demo/demo-signer.json";
 import hdf5Samples from "../../demo/samples/hdf5.json";
-import h5Raw from "../../demo/samples/diffraction_raw.hspy";
-import cbfUnsigned from "../../demo/samples/unsigned.cbf";
+import zarrSamples from "../../demo/samples/zarr.json";
 
 const NOTE = "Signed in a web browser by the Detector Provenance demo";
-const SAMPLES = [
-  { file: "unsigned.cbf", bytes: cbfUnsigned },
-  ...hdf5Samples.filter((s) => s.sign).map((s) => ({ file: s.file, bytes: h5Raw })),
-];
+const UNSIGNED = ["unsigned.cbf", ...[...hdf5Samples, ...zarrSamples].filter((s) => s.sign).map((s) => s.file)];
 
 function stemAndExt(name) {
   const dot = name.lastIndexOf(".");
@@ -40,6 +37,10 @@ function methodFor(file) {
   if (cbf.sniff(file.bytes)) return { kind: "cbf", text: "CBF file: the signature is added inside the file." };
   if (isHdf5(file.bytes)) {
     return { kind: "hdf5", text: "HDF5 file: the signature is added inside the file, as a /framesig group." };
+  }
+  if (isZip(file.bytes)) {
+    return { kind: "zarr",
+      text: "Zip file: if it holds a Zarr store, such as a quantEM file or a zipped HyperSpy .zspy, the signature is added as an attribute of its root group." };
   }
   if (CONVERTIBLE.has(extension(file.name))) {
     return { kind: "convert",
@@ -99,6 +100,8 @@ function render({ el }) {
     const [stem, ext] = stemAndExt(file.name);
     const name = method === "convert" ? `${stem}-signed.hspy` : `${stem}-signed${ext}`;
     status(method === "convert" ? "Converting and signing..." : "Signing...");
+    const container = method === "zarr" ? "Zarr store, which opens in quantEM, HyperSpy and zarr" :
+      "HDF5 file, which opens in HyperSpy and any HDF5 reader";
     return inScratch(py, async (dir) => {
       const dp = py.pyimport("dp_web");
       const certs = py.toPy(demoSigner.certificates);
@@ -108,6 +111,9 @@ function render({ el }) {
         py.FS.writeFile(`${dir}/${file.name}`, file.bytes);
         res = JSON.parse(dp.convert_and_sign(`${dir}/${file.name}`, file.name, outPath, chosenKey(),
                                              demoSigner.pkcs8, certs, ROOT_PEM, NOTE));
+      } else if (method === "zarr") {
+        py.FS.writeFile(outPath, file.bytes);
+        res = JSON.parse(dp.sign_zarr(outPath, chosenKey(), demoSigner.pkcs8, certs, ROOT_PEM, NOTE));
       } else {
         py.FS.writeFile(outPath, file.bytes);
         res = JSON.parse(dp.sign_h5(outPath, chosenKey(), demoSigner.pkcs8, certs, ROOT_PEM, NOTE));
@@ -115,7 +121,7 @@ function render({ el }) {
       certs.destroy();
       const bytes = py.FS.readFile(outPath);
       return { name, card: resultCard(name, res.result, previewCanvas(res.preview)), downloads: [[name, bytes]],
-               note: (res.note ? res.note + " " : "") + "The signature is stored inside the HDF5 file, which opens in HyperSpy and any HDF5 reader." };
+               note: (res.note ? res.note + " " : "") + `The signature is stored inside the ${container}.` };
     });
   }
 
@@ -143,13 +149,22 @@ function render({ el }) {
   }
   signBtn.addEventListener("click", sign);
 
-  const chip = (s) =>
-    h("button", { class: "dpw-chip", type: "button",
-                  onclick: () => load({ name: s.file, bytes: fromBase64String(s.bytes) }) },
-      h("i", { class: "dpw-dot", style: "background:var(--red)" }), s.file);
+  async function loadSample(name) {
+    fileLine.textContent = `Loading ${name}...`;
+    try {
+      load({ name, bytes: await sampleBytes(name) });
+    } catch (e) {
+      fileLine.textContent = e.message;
+    }
+  }
+  const chip = (name) =>
+    h("button", { class: "dpw-chip", type: "button", onclick: () => loadSample(name) },
+      h("i", { class: "dpw-dot", style: "background:var(--red)" }), name);
   const groups = [
-    { label: "CBF", chips: SAMPLES.filter((s) => s.file.endsWith(".cbf")).map(chip) },
-    { label: "HyperSpy (.hspy, HDF5)", chips: SAMPLES.filter((s) => s.file.endsWith(".hspy")).map(chip) },
+    { label: "CBF", chips: UNSIGNED.filter((f) => f.endsWith(".cbf")).map(chip) },
+    { label: "HyperSpy (.hspy, HDF5)", chips: UNSIGNED.filter((f) => f.endsWith(".hspy")).map(chip) },
+    { label: "quantEM (Zarr)", chips: UNSIGNED.filter((f) => f.includes("_quantem_")).map(chip) },
+    { label: "HyperSpy (.zspy, Zarr)", chips: UNSIGNED.filter((f) => f.includes("_zspy_")).map(chip) },
   ];
 
   root.appendChild(h("div", { class: "dpw-box" },
@@ -158,7 +173,7 @@ function render({ el }) {
         label: "Load a file",
         multiple: false,
         onFiles: (files) => load(files[0]),
-        hint: "CBF and HDF5 files, such as HyperSpy .hspy, are signed in place. Proprietary formats such as .dm3 are converted to .hspy first. The file never leaves your browser.",
+        hint: "CBF, HDF5 (such as HyperSpy .hspy) and zipped Zarr files (quantEM, HyperSpy .zspy) are signed in place. Proprietary formats such as .dm3 are converted to .hspy first. The file never leaves your browser.",
       }),
       "Or try an unsigned sample",
       groups),

@@ -1,21 +1,26 @@
 [
   {
-    "file": "diffraction_hardware-signed.hspy",
+    "file": "moire_diffraction_hardware-signed.hspy",
     "light": "green",
     "description": "Real diffraction data in HyperSpy's open HDF5 format, signed in place by the demo instrument key held in secure hardware."
   },
   {
-    "file": "diffraction_software-signed.hspy",
+    "file": "moire_diffraction_software-signed.hspy",
     "light": "yellow",
     "description": "The same data signed in place with the website's demo key, which is held in software."
   },
   {
-    "file": "diffraction_tampered.hspy",
+    "file": "moire_diffraction_metadata-modified.hspy",
+    "light": "violet",
+    "description": "The hardware-signed file with its pixel size edited by 5% after signing; the values are unchanged."
+  },
+  {
+    "file": "moire_diffraction_tampered.hspy",
     "light": "violet",
     "description": "The hardware-signed file with an extra diffraction peak added after signing."
   },
   {
-    "file": "diffraction_raw.hspy",
+    "file": "moire_diffraction_raw.hspy",
     "light": "red",
     "sign": true,
     "description": "The same data, converted to HDF5 but not signed."

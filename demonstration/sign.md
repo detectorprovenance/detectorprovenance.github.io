@@ -11,4 +11,8 @@ We provide two keys, which show why a valid signature is not sufficient by itsel
 
 ## File formats
 
-CBF files are signed in place. Every other format receives a separate `.framesig` signature file, and the original file is left unchanged. Support for proprietary formats, which will be converted to open formats such as HDF5 or ZSpy before signing, is in development.
+CBF files and HDF5 files, such as HyperSpy `.hspy`, EMD and NeXus files, are signed in place: the signature is added inside the file, which still opens in its usual software. Proprietary formats that rosettasciio can read, such as Digital Micrograph `.dm3` and `.dm4` files, are first converted to HyperSpy's open `.hspy` format, with their data and metadata, and the converted file is signed. Zarr stores, such as quantEM files and HyperSpy `.zspy`, are signed in place when loaded as a `.zip`: the signature is added as an attribute of the root group, and quantEM, HyperSpy and zarr open the signed store as before. Every other format receives a separate `.framesig` signature file, and the original file is left unchanged. HDF5 and Zarr signing and format conversion use our Python reference implementation and rosettasciio, which run inside your browser using Pyodide, so the first such file takes 10 to 20 s while they load.
+
+## Sample files
+
+The unsigned samples in the tool above can also be downloaded: {download}`unsigned.cbf <../demo/samples/unsigned.cbf>`, {download}`moire_diffraction_raw.hspy <../demo/samples/moire_diffraction_raw.hspy>`, {download}`moire_diffraction_quantem_raw.zip <../demo/samples/moire_diffraction_quantem_raw.zip>`, {download}`moire_diffraction_zspy_raw.zip <../demo/samples/moire_diffraction_zspy_raw.zip>`.

@@ -77,7 +77,10 @@ const CSS = `
 .dpw .dpw-choice label { display:flex; gap:10px; align-items:flex-start; font-size:15px; line-height:1.45; cursor:pointer; }
 .dpw .dpw-choice input { margin-top:4px; accent-color:var(--accent); }
 .dpw .dpw-error { color:var(--red); font-size:14.5px; margin-top:10px; }
-@media (max-width: 560px) { .dpw .dpw-thumb { display:none; } }
+@media (max-width: 560px) {
+  .dpw .dpw-card { flex-wrap:wrap; }
+  .dpw .dpw-thumb { width:100%; max-width:100%; order:3; }
+}
 `;
 
 /** Root element, scoped stylesheet, and dark-mode tracking. */
@@ -322,6 +325,25 @@ export function previewCanvas(preview) {
 /** A one-line progress message that a later result replaces. */
 export function statusLine(text) {
   return h("div", { class: "dpw-small", style: "margin-top:12px" }, text);
+}
+
+const SAMPLE_CACHE = new Map();
+
+/**
+ * A sample file's bytes, fetched from this page's own download link for it
+ * (MyST copies each {download} file into the site under a hashed name, so the
+ * link is the only stable reference). Same site, nothing leaves the browser.
+ */
+export async function sampleBytes(file) {
+  if (!SAMPLE_CACHE.has(file)) {
+    const link = [...document.querySelectorAll("a")].find((a) => a.textContent.trim() === file);
+    if (!link) throw new Error(`this page has no download link for ${file}`);
+    SAMPLE_CACHE.set(file, fetch(link.href).then((r) => {
+      if (!r.ok) throw new Error(`could not load ${file} (${r.status})`);
+      return r.arrayBuffer();
+    }).then((b) => new Uint8Array(b)));
+  }
+  return SAMPLE_CACHE.get(file);
 }
 
 export function fromBase64String(b64) {

@@ -1,43 +1,22 @@
 // Verify widget: load files in the browser, verify them against the demo
 // trust anchor, and show a three-lamp light. Nothing is uploaded.
 //
-// CBF and sidecar-signed files are verified in JavaScript. HDF5 files signed
-// in place are verified by framesig itself, running in the page (python.js).
+// CBF and sidecar-signed files are verified in JavaScript. HDF5 files and
+// Zarr zips (quantEM, HyperSpy .zspy) signed in place are verified by
+// framesig itself, running in the page (python.js). Sample files are fetched
+// from this page's own download links.
 //
 //   :::{anywidget} ../widgets/verify-demo.js
 //   :::
 
 import { verifyFrame } from "../framesig/verify.js";
 import {
-  ROOTS, ROOT_PEM, fileLoader, frameThumbnail, fromBase64String, h, mount, previewCanvas, resultCard, split, statusLine,
+  ROOTS, ROOT_PEM, fileLoader, frameThumbnail, h, mount, previewCanvas, resultCard, sampleBytes, split, statusLine,
 } from "./common.js";
-import { inScratch, isHdf5, python } from "./python.js";
-import samples from "../../demo/samples/index.json";
+import { inScratch, isHdf5, isZip, python } from "./python.js";
+import cbfSamples from "../../demo/samples/index.json";
 import hdf5Samples from "../../demo/samples/hdf5.json";
-import genuine from "../../demo/samples/genuine.cbf";
-import softwareSigned from "../../demo/samples/software-signed.cbf";
-import testPattern from "../../demo/samples/test-pattern.cbf";
-import fabricated from "../../demo/samples/fabricated.cbf";
-import unsigned from "../../demo/samples/unsigned.cbf";
-import tampered from "../../demo/samples/tampered.cbf";
-import metadataModified from "../../demo/samples/metadata-modified.cbf";
-import h5Hardware from "../../demo/samples/diffraction_hardware-signed.hspy";
-import h5Software from "../../demo/samples/diffraction_software-signed.hspy";
-import h5Tampered from "../../demo/samples/diffraction_tampered.hspy";
-
-const SAMPLE_BYTES = {
-  "genuine.cbf": genuine,
-  "software-signed.cbf": softwareSigned,
-  "test-pattern.cbf": testPattern,
-  "fabricated.cbf": fabricated,
-  "unsigned.cbf": unsigned,
-  "tampered.cbf": tampered,
-  "metadata-modified.cbf": metadataModified,
-  "diffraction_hardware-signed.hspy": h5Hardware,
-  "diffraction_software-signed.hspy": h5Software,
-  "diffraction_tampered.hspy": h5Tampered,
-};
-const SAMPLES = [...samples, ...hdf5Samples.filter((s) => SAMPLE_BYTES[s.file])];
+import zarrSamples from "../../demo/samples/zarr.json";
 
 const SIDECAR = ".framesig";
 
@@ -57,18 +36,22 @@ function pairUp(files) {
   return jobs;
 }
 
-async function verifyHdf5(job, status) {
+/** HDF5 files and Zarr zips, verified by framesig in Python. */
+async function verifyInPython(job, kind, status) {
   const py = await python(status);
-  status("Verifying the HDF5 file...");
+  status(kind === "zarr" ? "Verifying the Zarr store..." : "Verifying the HDF5 file...");
   const out = await inScratch(py, async (dir) => {
-    py.FS.writeFile(`${dir}/in.h5`, job.bytes);
-    return JSON.parse(py.pyimport("dp_web").verify_h5(`${dir}/in.h5`, ROOT_PEM));
+    const path = `${dir}/in.${kind === "zarr" ? "zip" : "h5"}`;
+    py.FS.writeFile(path, job.bytes);
+    const dp = py.pyimport("dp_web");
+    return JSON.parse(kind === "zarr" ? dp.verify_zarr(path, ROOT_PEM) : dp.verify_h5(path, ROOT_PEM));
   });
   return { result: out.result, thumb: previewCanvas(out.preview) };
 }
 
 async function verifyJob(job, status) {
-  if (!job.sidecar && isHdf5(job.bytes)) return verifyHdf5(job, status);
+  if (!job.sidecar && isHdf5(job.bytes)) return verifyInPython(job, "hdf5", status);
+  if (!job.sidecar && isZip(job.bytes)) return verifyInPython(job, "zarr", status);
   let sidecar;
   if (job.sidecar) {
     try {
@@ -108,13 +91,23 @@ function render({ el }) {
     }
   }
 
+  async function showSample(file) {
+    results.replaceChildren(statusLine(`Loading ${file}...`));
+    try {
+      await show([{ name: file, bytes: await sampleBytes(file) }]);
+    } catch (e) {
+      results.replaceChildren(h("div", { class: "dpw-error" }, e.message));
+    }
+  }
+
   const chip = (s) =>
-    h("button", { class: "dpw-chip", type: "button", title: s.description,
-                  onclick: () => show([{ name: s.file, bytes: fromBase64String(SAMPLE_BYTES[s.file]) }]) },
+    h("button", { class: "dpw-chip", type: "button", title: s.description, onclick: () => showSample(s.file) },
       h("i", { class: "dpw-dot", style: `background:var(--${s.light})` }), s.file);
   const groups = [
-    { label: "CBF", chips: SAMPLES.filter((s) => s.file.endsWith(".cbf")).map(chip) },
-    { label: "HyperSpy (.hspy, HDF5)", chips: SAMPLES.filter((s) => s.file.endsWith(".hspy")).map(chip) },
+    { label: "CBF", chips: cbfSamples.map(chip) },
+    { label: "HyperSpy (.hspy, HDF5)", chips: hdf5Samples.map(chip) },
+    { label: "quantEM (Zarr)", chips: zarrSamples.filter((s) => s.file.includes("_quantem_")).map(chip) },
+    { label: "HyperSpy (.zspy, Zarr)", chips: zarrSamples.filter((s) => s.file.includes("_zspy_")).map(chip) },
   ];
 
   root.appendChild(h("div", { class: "dpw-box" },
@@ -123,7 +116,7 @@ function render({ el }) {
         label: "Load data",
         multiple: true,
         onFiles: show,
-        hint: "CBF and HDF5 files, such as HyperSpy .hspy, carry their signature inside. Load any other file together with its .framesig file. Files never leave your browser.",
+        hint: "CBF, HDF5 (such as HyperSpy .hspy) and zipped Zarr files (quantEM, HyperSpy .zspy) carry their signature inside. Load any other file together with its .framesig file. Files never leave your browser.",
       }),
       "Or try a sample",
       groups)));

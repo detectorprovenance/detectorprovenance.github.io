@@ -1,7 +1,7 @@
-// Python in the page, for HDF5 files and for converting proprietary formats.
+// Python in the page, for HDF5 files, Zarr zips, and converting proprietary formats.
 //
 // Pyodide runs CPython compiled to WebAssembly in the browser. The packages
-// (numpy, h5py, cryptography, and rosettasciio when a file needs converting)
+// (numpy, h5py, numcodecs, cryptography, and rosettasciio when a file needs converting)
 // are downloaded from public package mirrors the first time; the files being
 // verified or signed never leave the page. framesig, the reference
 // implementation, is bundled into this widget as a wheel.
@@ -21,6 +21,10 @@ export const CONVERTIBLE = new Set([
   "mib", "blo", "unf", "rpl", "prz", "bcf", "spx", "spc", "spd", "pts", "asw", "map",
   "sur", "pro", "wdf", "img", "dens",
 ]);
+
+export function isZip(bytes) {
+  return bytes.length >= 4 && bytes[0] === 0x50 && bytes[1] === 0x4b && bytes[2] === 0x03 && bytes[3] === 0x04;
+}
 
 export function isHdf5(bytes) {
   return bytes.length >= 8 && HDF5_MAGIC.every((b, i) => bytes[i] === b);
@@ -42,7 +46,7 @@ export function python(status = () => {}) {
       const url = PYODIDE;
       const { loadPyodide } = await import(url);
       const py = await loadPyodide();
-      await py.loadPackage(["numpy", "h5py", "cryptography", "micropip"], { messageCallback: () => {} });
+      await py.loadPackage(["numpy", "h5py", "numcodecs", "cryptography", "micropip"], { messageCallback: () => {} });
       py.FS.writeFile(`/tmp/${WHEEL}`, fromBase64String(WHEEL_B64));
       await py.runPythonAsync(`import micropip\nawait micropip.install("emfs:/tmp/${WHEEL}", deps=False)`);
       py.FS.writeFile("/tmp/dp_web.py", DP_WEB);
