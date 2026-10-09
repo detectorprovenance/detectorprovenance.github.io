@@ -1,0 +1,29 @@
+# MyST build output
+_build/
+node_modules/
+
+# Claude Code
+.claude/
+CLAUDE.md
+.claude.json
+.mcp.json
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+Icon?
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/

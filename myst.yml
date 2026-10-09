@@ -1,0 +1,55 @@
+# MyST configuration for the Detector Provenance site.
+# See: https://mystmd.org/guide/frontmatter
+version: 1
+project:
+  id: detectorprovenance
+  title: Detector Provenance
+  description: >
+    An open specification and tools for verifying the provenance of scientific
+    detector data, including images, movies, and spectra, using signatures
+    made inside the detector.
+  keywords:
+    - provenance
+    - data integrity
+    - digital signatures
+    - scientific detectors
+    - crystallography
+    - electron microscopy
+  github: https://github.com/detectorprovenance/detectorprovenance.github.io
+  license: BSD-3-Clause
+  exclude:
+    - README.md
+  abbreviations:
+    CA: certificate authority
+    CBF: Crystallographic Binary File
+    EELS: electron energy loss spectroscopy
+    HSM: hardware security module
+    OID: object identifier
+    PKI: public key infrastructure
+    STEM: scanning transmission electron microscopy
+    TLS: Transport Layer Security
+    TPM: Trusted Platform Module
+    TSA: timestamping authority
+  toc:
+    - file: index.md
+    - file: threat-model.md
+    - file: how-it-works.md
+    - file: assurance.md
+    - file: manufacturers.md
+    - file: status.md
+site:
+  template: book-theme
+  title: Detector Provenance
+  options:
+    # Custom theming, see ./style.css
+    style: ./style.css
+    logo_text: Detector Provenance
+    outline_maxdepth: 2
+    hide_footer_links: true
+  nav:
+    - title: GitHub
+      url: https://github.com/detectorprovenance
+    - title: FAIR Data
+      url: https://www.go-fair.org/fair-principles/
+    - title: C2PA
+      url: https://c2pa.org/
