@@ -22,6 +22,10 @@ A raw data file today is an unsigned sequence of bytes, and the scientific commu
 
 The detector holds a private signing key inside a secure element, which is a tamper-resistant chip that generates the key and never allows it to be exported. The manufacturer issues a certificate that binds this key to the detector's serial number, using the same public key infrastructure (PKI) that secures web traffic. During acquisition, the detector computes a cryptographic digest of every frame and signs the complete run with a single signature. Anyone can then check that each file is unmodified, and that it was signed by a specific instrument certified by its manufacturer. [Signing and verification](how-it-works.md) describes the keys, certificates, signatures, and verification steps.
 
+## Demonstration
+
+The demonstration [verifies](demonstration/verify.md) and [signs](demonstration/sign.md) files entirely in your web browser, using sample files that cover every possible result. Files are never uploaded.
+
 ## Integrity and assurance
 
 A valid signature by itself establishes very little, because anyone can generate a key and use it to sign a fabricated file. We therefore report two separate results for every file: **integrity**, which states whether the bytes have changed since signing, and **assurance**, which states what the signature establishes about the origin of the file. Only data signed during a physical exposure by a manufacturer-certified key inside the instrument passes verification. A signature cannot establish that the experiment itself was honest, since a real detector recording a fabricated sample produces genuine frames. [Assurance levels](assurance.md) defines each level.

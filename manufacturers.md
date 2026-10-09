@@ -4,6 +4,18 @@ Data from a detector can only be distinguished from fabricated data if the detec
 
 ## Requirements
 
+The figure below shows the detector components referred to in requirements 1, 3, and 5.
+
+:::{image} assets/figures/detector-architecture-light.svg
+:class: dp-light-only
+:alt: Detector electronics. The sensor, FPGA, and secure element form the readout path, which is the only route to the signing key, and the secure element sends the signed run to storage. The control interface, file writer, service and debug commands, and firmware update mechanism have no access to the signing key.
+:::
+
+:::{image} assets/figures/detector-architecture-dark.svg
+:class: dp-dark-only
+:alt: Detector electronics. The sensor, FPGA, and secure element form the readout path, which is the only route to the signing key, and the secure element sends the signed run to storage. The control interface, file writer, service and debug commands, and firmware update mechanism have no access to the signing key.
+:::
+
 1. **Key generation inside the detector.** The detector generates its key pair inside a secure element, such as a TPM 2.0 or a dedicated security chip with a certified guarantee that keys cannot be exported. The private key must never exist outside that chip, including in firmware, provisioning databases, service laptops, or escrow. Each unit needs its own key, because a key shared across a product line means that one extraction compromises every instrument ever sold.
 
 2. **Manufacturer certificates.** At manufacture, the vendor signs a certificate that binds the unit's public key to its serial number, through a chain from an offline root CA to an issuing CA to the unit certificate. This is the device identity (IDevID) defined by IEEE 802.1AR, and manufacturers that already ship 802.1AR certificates can reuse the same process and tools. The certificate carries a policy identifier stating that the key is held inside the instrument and can only be reached from the sensor readout path. The root certificate should be published at a stable URL.

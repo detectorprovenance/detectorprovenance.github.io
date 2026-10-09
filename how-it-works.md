@@ -41,7 +41,17 @@ Signing the metadata together with the pixel data also protects against ordinary
 
 A secure element requires tens of milliseconds per signature, which limits per-frame signing to approximately 10 frames per second, while modern detectors record hundreds to thousands of frames per second. We therefore compute a digest for every frame as it is written, combine the digests into a Merkle tree, and sign only the root of the tree, once per run. During a long run, the signer also folds each frame into a running hash and can sign its current value every few seconds as a checkpoint, so a run that is interrupted still has signed segments, and the checkpoints show where a gap or change occurred. Each frame stores a short proof of its position in the tree, with a size that grows logarithmically with the number of frames, so each frame remains individually verifiable offline. Because the tree records the order of the frames, a verifier can also detect frames that were removed, duplicated, or reordered, which per-frame signatures cannot detect.
 
-We measured the effect of this design using a TPM on a standard Windows computer. Signing six frames individually took 8.1 s, while signing the same six frames as one run took 2.3 s, because the run required a single TPM operation regardless of the number of frames.
+:::{image} assets/figures/run-signing-light.svg
+:class: dp-light-only
+:alt: A Merkle tree over the digests of eight frames, with the root signed once by the secure element. The path from frame 3 to the root and the three digests stored as its proof are highlighted. A schematic timeline below compares signing every frame, which falls behind the detector, with computing digests for every frame and signing the root once at the end of the run.
+:::
+
+:::{image} assets/figures/run-signing-dark.svg
+:class: dp-dark-only
+:alt: A Merkle tree over the digests of eight frames, with the root signed once by the secure element. The path from frame 3 to the root and the three digests stored as its proof are highlighted. A schematic timeline below compares signing every frame, which falls behind the detector, with computing digests for every frame and signing the root once at the end of the run.
+:::
+
+We measured the effect of this design using a TPM on a standard computer. Signing a short run as a single unit was approximately 3.5 times faster than signing each frame individually, and this advantage increases with the length of the run, because a run requires a single TPM operation regardless of the number of frames.
 
 A run can also be stored as a single HDF5 file in the layout that NeXus readers expect, a stack of frames together with the signed frame records and the one run signature. HDF5 files are not byte-for-byte reproducible, so the signature covers the decoded pixel values and metadata of each frame rather than the bytes of the file, and the verifier still reports each frame separately. Before reading any pixel, the verifier rejects any content that the signature does not cover, such as an additional dataset, a link to another file, or a compression filter that would load external code. Because the work for each frame is independent, it runs on all processor cores while the run is still signed once. For frames from a 6-megapixel detector, packing a run on one workstation took 0.36 s per frame on one core and 0.08 s per frame on twelve cores, so a run of 3600 frames takes about five minutes. A run in this form is checked against the manufacturer certificate chain, revocation lists, and timestamps in the same way as a single frame, and a facility can add a timestamp to a packed run later without access to the detector key.
 

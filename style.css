@@ -2,8 +2,9 @@
    Detector Provenance: custom theming on top of MyST book-theme.
    Loaded via `site.options.style` in myst.yml.
 
-   Accent: dark red rgb(204,0,0) (matching the quantEM docs),
-   lightened in dark mode for contrast on the dark background.
+   Accent: dark red rgb(204,0,0) (matching the quantEM docs). Dark mode
+   uses rgb(255,30,30): the least-washed red that keeps 4.5:1 contrast
+   on the dark background (pure #ff0000 gives 4.37:1).
    ============================================================ */
 
 :root {
@@ -11,8 +12,8 @@
   --dp-accent-soft: rgba(204, 0, 0, 0.12);
 }
 html.dark {
-  --dp-accent: rgb(255, 63, 63);
-  --dp-accent-soft: rgba(255, 63, 63, 0.18);
+  --dp-accent: rgb(255, 30, 30);
+  --dp-accent-soft: rgba(255, 30, 30, 0.18);
 }
 
 /* ---------- Site title (upper-left) ---------- */

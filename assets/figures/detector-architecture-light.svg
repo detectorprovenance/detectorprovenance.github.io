@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-label="Detector electronics in which only the readout path can reach the signing key">
+<defs><linearGradient id="g-cyan" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0c8599"/><stop offset="1" stop-color="#0b7285"/></linearGradient><linearGradient id="g-violet" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7048e8"/><stop offset="1" stop-color="#5f3dc4"/></linearGradient><linearGradient id="g-indigo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4263eb"/><stop offset="1" stop-color="#364fc7"/></linearGradient><linearGradient id="g-blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1c7ed6"/><stop offset="1" stop-color="#1864ab"/></linearGradient><linearGradient id="g-green" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f9e44"/><stop offset="1" stop-color="#24753a"/></linearGradient><linearGradient id="g-gray" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#868e96"/><stop offset="1" stop-color="#5c636a"/></linearGradient><filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.18"/></filter><marker id="head" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto"><path d="M1,1 L11,6 L1,11 Z" fill="#868e96"/></marker></defs>
+<rect x="10" y="10" width="740" height="500" rx="22" fill="#4263eb" fill-opacity="0.07" stroke="#4263eb" stroke-opacity="0.35" stroke-width="1.5"/><text x="30" y="46" font-size="18" font-weight="700" letter-spacing="1.6" fill="#4263eb">DETECTOR<tspan font-weight="400" letter-spacing="0" fill="#495057" dx="10">electronics</tspan></text>
+<rect x="28" y="64" width="704" height="200" rx="22" fill="#7048e8" fill-opacity="0.07" stroke="#7048e8" stroke-opacity="0.35" stroke-width="1.5"/><text x="48" y="100" font-size="18" font-weight="700" letter-spacing="1.6" fill="#7048e8">READOUT PATH<tspan font-weight="400" letter-spacing="0" fill="#495057" dx="10">the only route to the signing key</tspan></text>
+<rect x="46" y="118" width="200" height="130" rx="16" fill="url(#g-cyan)" filter="url(#shadow)"/>
+<rect x="131.0" y="137" width="8" height="8" rx="1.5" fill="none" stroke="#fff" stroke-width="2"/><rect x="131.0" y="148" width="8" height="8" rx="1.5" fill="none" stroke="#fff" stroke-width="2"/><rect x="131.0" y="159" width="8" height="8" rx="1.5" fill="none" stroke="#fff" stroke-width="2"/><rect x="142.0" y="137" width="8" height="8" rx="1.5" fill="none" stroke="#fff" stroke-width="2"/><rect x="142.0" y="148" width="8" height="8" rx="1.5" fill="#fff"/><rect x="142.0" y="159" width="8" height="8" rx="1.5" fill="none" stroke="#fff" stroke-width="2"/><rect x="153.0" y="137" width="8" height="8" rx="1.5" fill="none" stroke="#fff" stroke-width="2"/><rect x="153.0" y="148" width="8" height="8" rx="1.5" fill="none" stroke="#fff" stroke-width="2"/><rect x="153.0" y="159" width="8" height="8" rx="1.5" fill="none" stroke="#fff" stroke-width="2"/>
+<text x="146.0" y="200" text-anchor="middle" font-size="24" font-weight="700" fill="#fff">Sensor</text>
+<text x="146.0" y="230" text-anchor="middle" font-size="19" fill="#fff" fill-opacity="0.92">records each frame</text>
+<rect x="280" y="118" width="200" height="130" rx="16" fill="url(#g-blue)" filter="url(#shadow)"/>
+<rect x="364.0" y="138" width="32" height="28" rx="4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M375.0,144 l-2,16 M385.0,144 l-2,16 M370.0,149 h19 M369.0,156 h19" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="380.0" y="200" text-anchor="middle" font-size="24" font-weight="700" fill="#fff">FPGA</text>
+<text x="380.0" y="230" text-anchor="middle" font-size="19" fill="#fff" fill-opacity="0.92">computes digests</text>
+<rect x="514" y="118" width="200" height="130" rx="16" fill="url(#g-violet)" filter="url(#shadow)"/>
+<rect x="601.0" y="139" width="26" height="26" rx="4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="609.0" y="147" width="10" height="10" rx="1.5" fill="#fff"/><path d="M607.0,139 v-6 M607.0,165 v6 M601.0,145 h-6 M627.0,145 h6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M614.0,139 v-6 M614.0,165 v6 M601.0,152 h-6 M627.0,152 h6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M621.0,139 v-6 M621.0,165 v6 M601.0,159 h-6 M627.0,159 h6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="614.0" y="200" text-anchor="middle" font-size="24" font-weight="700" fill="#fff">Secure element</text>
+<text x="614.0" y="230" text-anchor="middle" font-size="19" fill="#fff" fill-opacity="0.92">signs the run</text>
+<rect x="770" y="118" width="180" height="130" rx="16" fill="url(#g-green)" filter="url(#shadow)"/>
+<path d="M860.0,135 L875.0,143 V161 L860.0,169 L845.0,161 V143 Z" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M845.0,143 L860.0,151 L875.0,143 M860.0,151 V169" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="860.0" y="200" text-anchor="middle" font-size="24" font-weight="700" fill="#fff">Signed run</text>
+<text x="860.0" y="230" text-anchor="middle" font-size="19" fill="#fff" fill-opacity="0.92">sent to storage</text>
+<path d="M250,183.0 H276" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head)"/>
+<path d="M484,183.0 H510" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head)"/>
+<path d="M718,183.0 H766" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head)"/>
+<rect x="46" y="362" width="152" height="100" rx="14" fill="url(#g-gray)" filter="url(#shadow)"/>
+<text x="122.0" y="406" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">Control</text>
+<text x="122.0" y="432" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">interface</text>
+<path d="M122.0,358 V302" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="9 7"/>
+<circle cx="122.0" cy="286" r="13" fill="none" stroke="#e03131" stroke-width="3"/><path d="M112.8077,295.1923 L131.1923,276.8077" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<rect x="218" y="362" width="152" height="100" rx="14" fill="url(#g-gray)" filter="url(#shadow)"/>
+<text x="294.0" y="406" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">File</text>
+<text x="294.0" y="432" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">writer</text>
+<path d="M294.0,358 V302" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="9 7"/>
+<circle cx="294.0" cy="286" r="13" fill="none" stroke="#e03131" stroke-width="3"/><path d="M284.8077,295.1923 L303.1923,276.8077" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<rect x="390" y="362" width="152" height="100" rx="14" fill="url(#g-gray)" filter="url(#shadow)"/>
+<text x="466.0" y="406" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">Service and</text>
+<text x="466.0" y="432" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">debug</text>
+<path d="M466.0,358 V302" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="9 7"/>
+<circle cx="466.0" cy="286" r="13" fill="none" stroke="#e03131" stroke-width="3"/><path d="M456.8077,295.1923 L475.1923,276.8077" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<rect x="562" y="362" width="152" height="100" rx="14" fill="url(#g-gray)" filter="url(#shadow)"/>
+<text x="638.0" y="406" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">Firmware</text>
+<text x="638.0" y="432" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">update</text>
+<path d="M638.0,358 V302" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="9 7"/>
+<circle cx="638.0" cy="286" r="13" fill="none" stroke="#e03131" stroke-width="3"/><path d="M628.8077,295.1923 L647.1923,276.8077" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<circle cx="792" cy="404" r="13" fill="none" stroke="#e03131" stroke-width="3"/><path d="M782.8077,413.1923 L801.1923,394.8077" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<text x="816" y="400" text-anchor="start" font-size="18" fill="#212529">no access to</text>
+<text x="816" y="424" text-anchor="start" font-size="18" fill="#212529">the signing key</text>
+</svg>
