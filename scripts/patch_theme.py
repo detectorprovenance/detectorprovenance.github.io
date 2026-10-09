@@ -1,5 +1,5 @@
 """Patch the downloaded book-theme template: replace the dialog-based
-search with a flat top-bar input.
+search with a flat top-bar input, and keep chosen sidebar sections expanded.
 
 The stock theme's search opens a modal dialog, and there is no template
 option to change it, so we patch the compiled bundles in _build/templates
@@ -215,6 +215,60 @@ INLINER_MARK = (
 INLINER = INLINER_MARK + _RUNTIME
 
 
+# -- sidebar sections kept open --------------------------------------------
+# The stock theme opens a sidebar section only while it contains the current
+# page, and collapses it again on navigation. Sections whose url, id or title
+# contains one of these strings start expanded instead. Ported from repro-em.
+EXPAND_SECTIONS_MATCHING = ["Demonstration"]
+
+# Matches the collapsible-section state hook in both the server and client
+# bundles (minified variable names differ between them):
+#   [s,o]=X.useState(r); useEffect(()=>{n.state==="idle"&&o(r)},[n.state]);
+#   let a=fn(e,i,t); return !i.children ...
+TOC_PATTERN = re.compile(
+    r'\[(\w),(\w)\]=([\w$]+(?:\.default)?)\.useState\((\w)\);'
+    r'\(0,([\w$]+)\.useEffect\)\(\(\)=>\{(\w)\.state==="idle"&&\2\([^;]*?\)\},'
+    r'(\[\6\.state[^\]]*\])\);let (\w)=[\w$]+\([^)]*\);return!(\w)\.c'
+)
+TOC_MARKER = ".title||'')).indexOf('"
+
+
+def toc_targets():
+    """The bundles carrying the TOC hook, found by content: the theme renames
+    its bundles on every release."""
+    import glob
+
+    cands = [os.path.join(THEME, "build", "index.js")] + sorted(
+        glob.glob(os.path.join(THEME, "public", "build", "**", "*.js"), recursive=True))
+    out = []
+    for p in cands:
+        try:
+            with open(p) as f:
+                src = f.read()
+        except (OSError, UnicodeDecodeError):
+            continue
+        if TOC_MARKER in src or TOC_PATTERN.search(src):
+            out.append(p)
+    return out
+
+
+def toc_patched(src):
+    def repl(m):
+        s, o, hook, active, eff, nav, deps, let_var, heading = m.groups()
+        # The TOC item exposes different fields in the server and client
+        # bundles, so match against url, id and title together.
+        key = f"(({heading}.url||'')+({heading}.id||'')+({heading}.title||''))"
+        tests = "||".join(f"{key}.indexOf('{p}')>=0" for p in EXPAND_SECTIONS_MATCHING)
+        keep_open = f"({tests}||{active})"
+        return (
+            f"[{s},{o}]={hook}.useState({keep_open});"
+            f'(0,{eff}.useEffect)(()=>{{{nav}.state==="idle"&&{o}({keep_open})}},'
+            f"{deps});let {let_var}=" + m.group(0).split(f"let {let_var}=", 1)[1]
+        )
+
+    return TOC_PATTERN.subn(repl, src)
+
+
 def main():
     if not os.path.isdir(THEME):
         sys.exit("book-theme template not found; run `myst build` first")
@@ -297,6 +351,22 @@ def main():
             with open(path, "w") as f:
                 f.write(s)
         print("renamed entry.client + manifest (cache bust)")
+
+    # keep chosen sidebar sections expanded
+    targets = toc_targets()
+    if not targets:
+        print("no sidebar bundle matched; theme version changed? sections stay collapsible")
+    for path in targets:
+        with open(path) as f:
+            src = f.read()
+        if TOC_MARKER in src:
+            print(f"already patched: {os.path.relpath(path, THEME)} (sidebar)")
+            continue
+        new, n = toc_patched(src)
+        with open(path, "w") as f:
+            f.write(new)
+        total += n
+        print(f"patched {os.path.relpath(path, THEME)} (sidebar sections, {n} site)")
 
     print(f"done ({total} replacements)")
 

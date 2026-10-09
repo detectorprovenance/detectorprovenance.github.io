@@ -2,8 +2,9 @@
    Detector Provenance: custom theming on top of MyST book-theme.
    Loaded via `site.options.style` in myst.yml.
 
-   Accent: dark red rgb(204,0,0) (matching the quantEM docs),
-   lightened in dark mode for contrast on the dark background.
+   Accent: dark red rgb(204,0,0) (matching the quantEM docs). Dark mode
+   uses rgb(255,30,30): the least-washed red that keeps 4.5:1 contrast
+   on the dark background (pure #ff0000 gives 4.37:1).
    ============================================================ */
 
 :root {
@@ -11,8 +12,8 @@
   --dp-accent-soft: rgba(204, 0, 0, 0.12);
 }
 html.dark {
-  --dp-accent: rgb(255, 63, 63);
-  --dp-accent-soft: rgba(255, 63, 63, 0.18);
+  --dp-accent: rgb(255, 30, 30);
+  --dp-accent-soft: rgba(255, 30, 30, 0.18);
 }
 
 /* ---------- Site title (upper-left) ---------- */
@@ -133,6 +134,15 @@ html.dark .myst-primary-sidebar-toc .dark\:text-blue-200 {
 .myst-primary-sidebar-toc a.myst-toc-item.active {
   color: var(--dp-accent) !important;
   font-weight: 700;
+}
+/* The section that contains the current page: bold in the ordinary text
+   colour, not the theme's blue (book-theme 1.4 marks it text-myst-accent-text). */
+.myst-primary-sidebar-toc .text-myst-accent-text {
+  color: rgb(28, 25, 23) !important;
+  font-weight: 700;
+}
+html.dark .myst-primary-sidebar-toc .text-myst-accent-text {
+  color: rgb(245, 245, 244) !important;
 }
 /* The site title is already in the top bar; drop the duplicate
    root entry at the top of the sidebar. */

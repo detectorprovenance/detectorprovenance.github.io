@@ -24,6 +24,16 @@ A verifier reports two independent results for every file. **Integrity** states 
 
 Only the `instrument` level passes verification. The verifier lowers the assurance level whenever a condition fails, and never raises it when information is missing. A claim that is absent from the file is treated as a claim that was not made.
 
+:::{image} assets/figures/assurance-ladder-light.svg
+:class: dp-light-only
+:alt: The four assurance levels drawn as steps of increasing height: none, self-attested, custodial, and instrument. Each step lists the conditions it meets, from a valid signature to a trusted chain, a key held inside the instrument, and a physical exposure. The five example files sit on their levels, and only the instrument level receives a pass mark.
+:::
+
+:::{image} assets/figures/assurance-ladder-dark.svg
+:class: dp-dark-only
+:alt: The four assurance levels drawn as steps of increasing height: none, self-attested, custodial, and instrument. Each step lists the conditions it meets, from a valid signature to a trusted chain, a key held inside the instrument, and a physical exposure. The five example files sit on their levels, and only the instrument level receives a pass mark.
+:::
+
 ## Example
 
 The demonstration in our reference implementation signs five frames that together cover every assurance level. All four signatures below are cryptographically valid, and the frames differ only in what the signature establishes about their origin:
@@ -43,4 +53,4 @@ OK   valid              instrument     4-genuine.cbf
 
 ## Display
 
-Our desktop and browser viewers show one of three marks for each file. Intact data at the `instrument` level receive a green mark. Intact data below the `instrument` level receive an amber mark, as do unsigned data, because an unsigned file and a self-attested file carry the same evidence about their origin. Data whose signature does not match the contents receive a red mark. We do not mark self-attested data in red because nothing in the file has been detected as forged, and we do not mark unsigned data in red because almost all existing data are unsigned.
+The [demonstration verifier](demonstration/verify.md) shows one of four lights for each file. Intact data at the `instrument` level receive a green light, and intact data at the `custodial` level receive a yellow light. Unsigned and `self-attested` data receive a red light, because an unsigned file and a self-attested file carry the same evidence about their origin. Data whose contents no longer match their signature receive a violet light. We use a separate color for modified data so that a detected modification is never confused with an absence of evidence, since almost all existing data are unsigned.

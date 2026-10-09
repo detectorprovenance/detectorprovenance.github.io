@@ -32,6 +32,10 @@ project:
     TSA: timestamping authority
   toc:
     - file: index.md
+    - title: Demonstration
+      children:
+        - file: demonstration/verify.md
+        - file: demonstration/sign.md
     - file: threat-model.md
     - file: how-it-works.md
     - file: assurance.md

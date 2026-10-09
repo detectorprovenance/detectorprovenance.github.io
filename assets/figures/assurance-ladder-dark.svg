@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 545" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-label="Assurance levels, from none to instrument, with the example files at each level">
+<defs><linearGradient id="g-cyan" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0c8599"/><stop offset="1" stop-color="#0b7285"/></linearGradient><linearGradient id="g-violet" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7048e8"/><stop offset="1" stop-color="#5f3dc4"/></linearGradient><linearGradient id="g-indigo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4263eb"/><stop offset="1" stop-color="#364fc7"/></linearGradient><linearGradient id="g-blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1c7ed6"/><stop offset="1" stop-color="#1864ab"/></linearGradient><linearGradient id="g-green" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f9e44"/><stop offset="1" stop-color="#24753a"/></linearGradient><linearGradient id="g-gray" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#868e96"/><stop offset="1" stop-color="#5c636a"/></linearGradient><filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.18"/></filter><marker id="head" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto"><path d="M1,1 L11,6 L1,11 Z" fill="#adb5bd"/></marker></defs>
+<text x="33" y="40" text-anchor="start" font-size="16" font-weight="700" fill="#ced4da" letter-spacing="1.4">EXAMPLE FILES</text>
+<rect x="33" y="350" width="205" height="120" rx="14" fill="url(#g-gray)" filter="url(#shadow)"/>
+<text x="135.5" y="392" text-anchor="middle" font-size="25" font-weight="700" fill="#fff">none</text>
+<text x="135.5" y="432" text-anchor="middle" font-size="18" fill="#fff" fill-opacity="0.9">no signature</text>
+<rect x="33" y="304" width="205" height="34" rx="8" fill="#2b2f33" stroke="#495057" stroke-width="1.5"/>
+<text x="135.5" y="327" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#f1f3f5">0-unsigned.cbf</text>
+<circle cx="79.0" cy="508" r="13" fill="#ff1e1e"/>
+<text x="100.0" y="515" text-anchor="start" font-size="19" font-weight="700" fill="#f1f3f5">Unverified</text>
+<rect x="256" y="280" width="205" height="190" rx="14" fill="url(#g-cyan)" filter="url(#shadow)"/>
+<text x="358.5" y="322" text-anchor="middle" font-size="25" font-weight="700" fill="#fff">self-attested</text>
+<path d="M274,356 l5.0,5.0 l9.0,-10.0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="298" y="362" text-anchor="start" font-size="18" fill="#fff">valid signature</text>
+<rect x="256" y="234" width="205" height="34" rx="8" fill="#2b2f33" stroke="#495057" stroke-width="1.5"/>
+<text x="358.5" y="257" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#f1f3f5">1-fabricated.cbf</text>
+<circle cx="302.0" cy="508" r="13" fill="#ff1e1e"/>
+<text x="323.0" y="515" text-anchor="start" font-size="19" font-weight="700" fill="#f1f3f5">Unverified</text>
+<rect x="479" y="210" width="205" height="260" rx="14" fill="url(#g-indigo)" filter="url(#shadow)"/>
+<text x="581.5" y="252" text-anchor="middle" font-size="25" font-weight="700" fill="#fff">custodial</text>
+<path d="M497,286 l5.0,5.0 l9.0,-10.0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="521" y="292" text-anchor="start" font-size="18" fill="#fff">valid signature</text>
+<path d="M497,314 l5.0,5.0 l9.0,-10.0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="521" y="320" text-anchor="start" font-size="18" fill="#fff">trusted chain</text>
+<rect x="479" y="164" width="205" height="34" rx="8" fill="#2b2f33" stroke="#495057" stroke-width="1.5"/>
+<text x="581.5" y="187" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#f1f3f5">3-test-pattern.cbf</text>
+<rect x="479" y="122" width="205" height="34" rx="8" fill="#2b2f33" stroke="#495057" stroke-width="1.5"/>
+<text x="581.5" y="145" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#f1f3f5">2-software-signed.cbf</text>
+<circle cx="498.75" cy="508" r="13" fill="#ffd43b"/>
+<text x="519.75" y="515" text-anchor="start" font-size="19" font-weight="700" fill="#f1f3f5">Software signed</text>
+<rect x="702" y="140" width="205" height="330" rx="14" fill="url(#g-green)" filter="url(#shadow)"/>
+<text x="804.5" y="182" text-anchor="middle" font-size="25" font-weight="700" fill="#fff">instrument</text>
+<path d="M720,216 l5.0,5.0 l9.0,-10.0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="744" y="222" text-anchor="start" font-size="18" fill="#fff">valid signature</text>
+<path d="M720,244 l5.0,5.0 l9.0,-10.0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="744" y="250" text-anchor="start" font-size="18" fill="#fff">trusted chain</text>
+<path d="M720,272 l5.0,5.0 l9.0,-10.0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="744" y="278" text-anchor="start" font-size="18" fill="#fff">key in instrument</text>
+<path d="M720,300 l5.0,5.0 l9.0,-10.0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="744" y="306" text-anchor="start" font-size="18" fill="#fff">physical exposure</text>
+<rect x="702" y="94" width="205" height="34" rx="8" fill="#2b2f33" stroke="#495057" stroke-width="1.5"/>
+<text x="804.5" y="117" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#f1f3f5">4-genuine.cbf</text>
+<circle cx="721.75" cy="508" r="13" fill="#69db7c"/>
+<text x="742.75" y="515" text-anchor="start" font-size="19" font-weight="700" fill="#f1f3f5">Hardware signed</text>
+</svg>

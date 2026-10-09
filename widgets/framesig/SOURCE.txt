@@ -1,0 +1,5 @@
+Copied from Frame_validation web/framesig/ at commit 6eb837d1818d0b391b540c0c8b1153c06daebabb.
+The copy included uncommitted changes:
+ M web/framesig/bytes.js
+ M web/framesig/der.js
+?? web/framesig/sign.js

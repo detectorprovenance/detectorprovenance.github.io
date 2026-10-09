@@ -1,0 +1,37 @@
+[
+  {
+    "file": "genuine.cbf",
+    "light": "green",
+    "description": "Signed inside the detector by a manufacturer-certified hardware key, during a physical exposure."
+  },
+  {
+    "file": "software-signed.cbf",
+    "light": "yellow",
+    "description": "Manufacturer-certified, but the key is held in software, so anyone with the key file can sign."
+  },
+  {
+    "file": "test-pattern.cbf",
+    "light": "yellow",
+    "description": "Signed by the detector's hardware key, but the detector reported a test pattern."
+  },
+  {
+    "file": "fabricated.cbf",
+    "light": "red",
+    "description": "A valid signature from a key generated for the purpose, which chains to no manufacturer."
+  },
+  {
+    "file": "unsigned.cbf",
+    "light": "red",
+    "description": "No signature at all, like almost every file recorded to date."
+  },
+  {
+    "file": "tampered.cbf",
+    "light": "violet",
+    "description": "The genuine frame with one pixel value changed after signing."
+  },
+  {
+    "file": "metadata-modified.cbf",
+    "light": "violet",
+    "description": "The genuine frame with its wavelength edited after signing; the pixels are unchanged."
+  }
+]
