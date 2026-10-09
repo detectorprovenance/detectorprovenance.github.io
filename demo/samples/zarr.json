@@ -1,0 +1,39 @@
+[
+  {
+    "file": "moire_diffraction_quantem_hardware-signed.zip",
+    "light": "green",
+    "description": "The diffraction pattern saved by quantEM as a Zarr zip, signed in place by the demo instrument key held in secure hardware."
+  },
+  {
+    "file": "moire_diffraction_quantem_software-signed.zip",
+    "light": "yellow",
+    "description": "The same quantEM file signed with the website's demo key."
+  },
+  {
+    "file": "moire_diffraction_quantem_tampered.zip",
+    "light": "violet",
+    "description": "The hardware-signed quantEM file with a diffraction peak added after signing."
+  },
+  {
+    "file": "moire_diffraction_quantem_raw.zip",
+    "light": "red",
+    "sign": true,
+    "description": "The quantEM file, unsigned."
+  },
+  {
+    "file": "moire_diffraction_zspy_hardware-signed.zip",
+    "light": "green",
+    "description": "The pattern as HyperSpy .zspy (Zarr format 2), zipped and signed in place by the demo instrument key."
+  },
+  {
+    "file": "moire_diffraction_zspy_tampered.zip",
+    "light": "violet",
+    "description": "The hardware-signed .zspy file with a diffraction peak added after signing."
+  },
+  {
+    "file": "moire_diffraction_zspy_raw.zip",
+    "light": "red",
+    "sign": true,
+    "description": "The .zspy file, zipped, unsigned."
+  }
+]

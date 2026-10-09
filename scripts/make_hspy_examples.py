@@ -10,6 +10,8 @@ and signs copies in place with framesig:
                                machine that ran tools/make_site_demo.py) and
                                its instrument certificate, physical exposure
   <stem>_software-signed.hspy  the website's demo key: custodial
+  <stem>_metadata-modified.hspy  the hardware-signed file with its pixel
+                               size edited after signing
   <stem>_tampered.hspy         the hardware-signed file with a peak added
                                after signing
 
@@ -124,6 +126,13 @@ def main():
               certificates_der=[base64.b64decode(c) for c in demo["certificates"]],
               claims={"note": "Detector Provenance demonstration file, signed with the website's demo key"})
 
+    edited = out / f"{stem}_metadata-modified.hspy"
+    shutil.copy(hw, edited)
+    with h5py.File(edited, "r+") as h:
+        name = next(k for k in h["Experiments"])
+        axis = h[f"Experiments/{name}/axis-0"]
+        axis.attrs["scale"] = float(axis.attrs["scale"]) * 1.05  # a 5% calibration change
+
     tampered = out / f"{stem}_tampered.hspy"
     shutil.copy(hw, tampered)
     with h5py.File(tampered, "r+") as h:
@@ -143,6 +152,9 @@ def main():
                             "demo instrument key held in secure hardware."},
             {"file": sw.name, "light": "yellow",
              "description": "The same data signed in place with the website's demo key, which is held in software."},
+            {"file": edited.name, "light": "violet",
+             "description": "The hardware-signed file with its pixel size edited by 5% after signing; "
+                            "the values are unchanged."},
             {"file": tampered.name, "light": "violet",
              "description": "The hardware-signed file with an extra diffraction peak added after signing."},
             {"file": raw_path.name, "light": "red", "sign": True,
@@ -151,7 +163,7 @@ def main():
     else:
         shutil.copy(DEMO / "demo-root.pem", out / "demo-root.pem")
     roots = load_certificates_pem((DEMO / "demo-root.pem").read_bytes())
-    for p in (raw_path, hw, sw, tampered):
+    for p in (raw_path, hw, sw, edited, tampered):
         r = verify_file(p, roots=roots)
         print(f"{p.name:34s} {p.stat().st_size / 1e6:5.1f} MB  {r.status:10s} {r.assurance.level}")
 

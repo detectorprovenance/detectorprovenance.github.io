@@ -39,7 +39,7 @@ A valid signature by itself establishes very little, because anyone can generate
 
 ## Data formats
 
-The specification keeps the signing and verification machinery separate from the file format, so that the same approach applies to diffraction frames, images, movies, and spectra. The current implementation supports X-ray diffraction frames stored in the Crystallographic Binary File (CBF/imgCIF) format, and can sign any other file byte for byte. A format-specific adapter such as the CBF adapter also records digests of the decoded pixel values, so that a signature remains verifiable after lossless recompression. A NeXus/HDF5 adapter is planned, which will extend this support to electron microscopy data such as 4D-STEM datasets and spectrum images.
+The specification keeps the signing and verification machinery separate from the file format, so that the same approach applies to diffraction frames, images, movies, and spectra. The current implementation signs X-ray diffraction frames in the Crystallographic Binary File (CBF/imgCIF) format, HDF5 files such as HyperSpy `.hspy`, EMD and NeXus files, and Zarr stores such as quantEM files and HyperSpy `.zspy`, in each case inside the file, which still opens in its usual software. For these formats the signature covers the decoded values and the metadata, so it remains verifiable after lossless recompression or repacking. Any other file can be signed byte for byte with a separate signature file, and proprietary formats can be converted to HyperSpy `.hspy` first.
 
 ## Project status
 

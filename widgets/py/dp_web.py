@@ -1,7 +1,8 @@
 """Python side of the demonstration widgets, run in the browser by Pyodide.
 
-Signs and verifies HDF5 files in place, and converts proprietary files to
-HyperSpy .hspy (HDF5) with rosettasciio before signing them. framesig, the
+Signs and verifies HDF5 files and Zarr zips (quantEM, HyperSpy .zspy) in
+place, and converts proprietary files to HyperSpy .hspy (HDF5) with
+rosettasciio before signing them. framesig, the
 reference implementation, does all signing and verification. Everything
 happens in the page's memory; no file leaves the browser.
 
@@ -18,6 +19,7 @@ import numpy as np
 from cryptography.hazmat.primitives.serialization import load_der_private_key
 
 from framesig.hdf5_tree import is_signed_hdf5, sign_hdf5, verify_hdf5
+from framesig import zarr_tree
 from framesig.keys import ALG_ECDSA_P256, SoftwareSigner, generate_private_key
 from framesig.pki import load_certificates_pem
 
@@ -102,6 +104,48 @@ def _verify(path, roots_pem):
 def verify_h5(path, roots_pem):
     """Verify an HDF5 file. Returns a JSON string."""
     return json.dumps(_verify(path, roots_pem))
+
+
+def _zarr_preview(path):
+    """Preview of the largest numeric array in a Zarr store."""
+    store = zarr_tree._Store(path)
+    try:
+        nodes, _, _, _ = zarr_tree.walk(np, store)
+        arrays = [n for n in nodes if n.kind == "array" and n.dtype.kind in "biuf" and int(np.prod(n.shape)) > 1]
+        if not arrays:
+            return None
+        n = max(arrays, key=lambda n: int(np.prod(n.shape)))
+        if len(n.shape) <= 2:
+            data = np.concatenate(list(n.slabs()))
+        else:
+            data = next(iter(n.slabs()))
+            while data.ndim > 2:
+                data = data[0]
+        return preview(data)
+    finally:
+        store.close()
+
+
+def verify_zarr(path, roots_pem):
+    """Verify a Zarr store (a zip, in the browser). Returns a JSON string."""
+    if not zarr_tree.is_zarr(path):
+        return json.dumps({"result": {"status": "unsigned", "assurance": {"level": "none"}, "manifest": None,
+                                      "problems": ["this zip does not hold a Zarr store"]}, "preview": None})
+    r = zarr_tree.verify_zarr(path, roots=load_certificates_pem(roots_pem.encode()))
+    try:
+        prev = _zarr_preview(path)
+    except Exception:  # noqa: BLE001 - the preview is optional
+        prev = None
+    return json.dumps({"result": _result_dict(r), "preview": prev})
+
+
+def sign_zarr(path, key_mode, pkcs8_b64, certs_b64, roots_pem, note):
+    """Sign a Zarr store in place, then verify it. Returns a JSON string."""
+    if not zarr_tree.is_zarr(path):
+        raise ValueError("this zip does not hold a Zarr store")
+    signer, chain = _signer(key_mode, pkcs8_b64, certs_b64)
+    zarr_tree.sign_zarr(path, signer, certificates_der=chain, claims={"note": note})
+    return verify_zarr(path, roots_pem)
 
 
 def _signer(key_mode, pkcs8_b64, certs_b64):
