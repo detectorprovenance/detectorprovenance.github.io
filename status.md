@@ -5,9 +5,10 @@ This page describes the state of the project as of October 2026. The reference i
 ## Current infrastructure
 
 - **A specification** for signed frames, signed runs, and signed datasets, written so that it can be implemented without reading our code.
-- **A reference implementation in Python** that signs and verifies data, with support for CBF/imgCIF files and a generic adapter for any other file. It supports Ed25519 and ECDSA P-256 signatures, test certificate authorities with chain validation, signing of complete runs using Merkle trees, runs packed into a single HDF5 file and verified frame by frame, the three-layer key hierarchy, signed dataset bundles, RFC 3161 timestamps, and revocation lists.
+- **A reference implementation in Python** that signs and verifies data, with support for CBF/imgCIF files and a generic adapter for any other file. It supports Ed25519 and ECDSA P-256 signatures, test certificate authorities with chain validation, signing of complete runs using Merkle trees, runs packed into a single HDF5 file and verified frame by frame, HDF5 files (such as HyperSpy `.hspy`, EMD and NeXus) and Zarr stores (such as quantEM files and HyperSpy `.zspy`) signed in place, the three-layer key hierarchy, signed dataset bundles, RFC 3161 timestamps, and revocation lists.
 - **Hardware-backed signing** with keys that cannot be exported, using the TPM on Windows and Linux and the Secure Enclave on macOS. These computers stand in for the secure element of a detector, and use the same code path.
-- **An independent verifier that runs in a web browser** with no dependencies, which reads files locally and never uploads them. It does not yet check timestamps or revocation.
+- **An independent verifier and signer that run in a web browser** with no dependencies, which read files locally and never upload them. They do not yet check timestamps or revocation. HDF5 and Zarr files are handled in the browser by the Python reference implementation, running in Pyodide.
+- **A [demonstration](demonstration/verify.md)** that verifies and signs CBF, HDF5 and Zarr files in the browser, and converts proprietary formats that rosettasciio reads, such as Digital Micrograph files, to HyperSpy `.hspy` before signing them.
 - **A desktop viewer and a browser viewer** that display each frame together with its verification result.
 - **Several hundred automated tests**, a shared set of test vectors used by both verifiers, and a collection of deliberately corrupted files, which both verifiers must either reject with a clear error or report as failed.
 
@@ -15,7 +16,7 @@ This page describes the state of the project as of October 2026. The reference i
 
 - **Detector support.** No detector currently signs data in hardware, and every certificate in our demonstrations comes from a test CA that we create. The scheme provides evidence of origin only once a key is held inside a detector, as described in [Manufacturer requirements](manufacturers.md).
 - **A permanent namespace for the policy identifiers.** The identifiers need to be registered by a neutral organization before any detector ships with this capability.
-- **A NeXus/HDF5 adapter for detector output.** Runs can already be packed into one HDF5 file and verified, but signing HDF5 files as a detector writes them would extend format-specific support to electron microscopy data such as 4D-STEM datasets and spectrum images.
+- **HDF5 files that store their data in other files.** Many detectors write a NeXus master file with external links to separate data files. These cannot yet be signed in place, because the signature would not cover the linked data; signing them requires covering the linked files as well.
 - **Signatures for processed data.** Processing steps such as integration, reconstruction, or background subtraction should extend the record of provenance instead of breaking it. This is designed but not built.
 - **Support for hardware security modules (HSMs) and security keys**, through a PKCS#11 interface, which a facility signing service would need.
 - **A transparency log**, without which a timestamp still depends on trusting the timestamping authority not to backdate it.
