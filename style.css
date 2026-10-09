@@ -135,6 +135,15 @@ html.dark .myst-primary-sidebar-toc .dark\:text-blue-200 {
   color: var(--dp-accent) !important;
   font-weight: 700;
 }
+/* The section that contains the current page: bold in the ordinary text
+   colour, not the theme's blue (book-theme 1.4 marks it text-myst-accent-text). */
+.myst-primary-sidebar-toc .text-myst-accent-text {
+  color: rgb(28, 25, 23) !important;
+  font-weight: 700;
+}
+html.dark .myst-primary-sidebar-toc .text-myst-accent-text {
+  color: rgb(245, 245, 244) !important;
+}
 /* The site title is already in the top bar; drop the duplicate
    root entry at the top of the sidebar. */
 .myst-toc > a.myst-toc-item[title="Detector Provenance"] {

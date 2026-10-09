@@ -7,6 +7,7 @@ import { colormapLut } from "../framesig/display.js";
 import { parsePem } from "../framesig/x509.js";
 import rootPem from "../../demo/demo-root.pem";
 
+export const ROOT_PEM = rootPem;
 export const ROOTS = parsePem(rootPem);
 
 export const LIGHTS = {
@@ -38,9 +39,25 @@ const CSS = `
 .dpw .dpw-chip:hover { border-color:var(--accent); }
 .dpw .dpw-dot { width:10px; height:10px; border-radius:50%; display:inline-block; flex:none; }
 .dpw .dpw-small { font-size:13.5px; color:var(--muted); line-height:1.5; }
+.dpw .dpw-split { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; align-items:stretch; }
+.dpw .dpw-split > div { min-width:0; }
+.dpw .dpw-split .dpw-drop { height:100%; display:flex; flex-direction:column; justify-content:center; gap:10px; }
+.dpw .dpw-list { display:flex; flex-direction:column; gap:6px; align-items:stretch; }
+.dpw .dpw-menu-wrap { position:relative; }
+.dpw .dpw-menu-btn { font:inherit; font-size:15px; font-weight:600; width:100%; display:flex; justify-content:space-between;
+  align-items:center; padding:9px 13px; border-radius:10px; cursor:pointer; border:1px solid var(--border);
+  background:var(--panel); color:var(--fg); }
+.dpw .dpw-menu-btn:hover { border-color:var(--accent); }
+.dpw .dpw-caret { color:var(--muted); }
+.dpw .dpw-menu { position:absolute; z-index:20; top:calc(100% + 4px); left:0; right:0; display:flex; flex-direction:column;
+  gap:4px; padding:6px; border-radius:10px; border:1px solid var(--border); background:var(--panel);
+  box-shadow:0 10px 28px rgba(0,0,0,.22); }
+.dpw .dpw-menu[hidden] { display:none; }
+.dpw .dpw-menu .dpw-chip { justify-content:flex-start; border:none; border-radius:7px; padding:7px 10px; }
+.dpw .dpw-menu .dpw-chip:hover { background:color-mix(in srgb, var(--accent) 10%, transparent); }
+.dpw .dpw-list .dpw-chip { justify-content:flex-start; border-radius:9px; padding:6px 11px; }
+@media (max-width: 640px) { .dpw .dpw-split { grid-template-columns:minmax(0,1fr); } }
 .dpw .dpw-label { font-size:12.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
-.dpw .dpw-legend { display:flex; gap:16px; flex-wrap:wrap; font-size:14px; }
-.dpw .dpw-legend span { display:inline-flex; gap:7px; align-items:center; }
 .dpw .dpw-card { display:flex; gap:16px; align-items:flex-start; border:1px solid var(--border); border-radius:14px;
   padding:14px; margin-top:12px; background:var(--panel); }
 .dpw .dpw-signal { flex:none; background:var(--housing); border-radius:14px; padding:8px 7px;
@@ -92,10 +109,31 @@ export function h(tag, attrs = {}, ...children) {
   return node;
 }
 
-export function legend() {
-  return h("div", { class: "dpw-legend" },
-    Object.entries(LIGHTS).map(([color, { label }]) =>
-      h("span", {}, h("i", { class: "dpw-dot", style: `background:var(--${color})` }), label)));
+/**
+ * Two panels: loading on the left, sample files on the right. `groups` is
+ * `[{label, chips}]`, one per format; each is a button that pops up a menu of
+ * its files.
+ */
+export function split(left, title, groups) {
+  const menus = [];
+  const closeAll = () => menus.forEach((m) => { m.hidden = true; });
+  const entries = groups.map((g) => {
+    const menu = h("div", { class: "dpw-menu", hidden: true }, g.chips);
+    menu.addEventListener("click", closeAll);  // picking a file closes the menu
+    menus.push(menu);
+    const button = h("button", { class: "dpw-menu-btn", type: "button", "aria-haspopup": "menu",
+                                 onclick: () => { const open = menu.hidden; closeAll(); menu.hidden = !open; } },
+      h("span", {}, g.label), h("span", { class: "dpw-caret" }, "\u25be"));
+    return h("div", { class: "dpw-menu-wrap" }, button, menu);
+  });
+  const panel = h("div", {},
+    h("div", { class: "dpw-label", style: "margin-bottom:8px" }, title),
+    h("div", { class: "dpw-list" }, entries));
+  // Close on any click outside the menus (events from the shadow DOM are retargeted).
+  document.addEventListener("click", (e) => {
+    if (!e.composedPath().some((n) => n.classList && n.classList.contains("dpw-menu-wrap"))) closeAll();
+  });
+  return h("div", { class: "dpw-split" }, h("div", {}, left), panel);
 }
 
 /** A file input plus a drop zone; calls `onFiles([{name, bytes}])`. */
@@ -108,8 +146,9 @@ export function fileLoader({ label, multiple, onFiles, hint }) {
   };
   input.addEventListener("change", () => { read(input.files); input.value = ""; });
   const drop = h("div", { class: "dpw-drop" },
-    h("button", { class: "dpw-btn", type: "button", onclick: () => input.click() }, label),
-    h("div", { style: "margin-top:8px" }, hint));
+    h("div", {}, h("button", { class: "dpw-btn", type: "button", onclick: () => input.click() }, label)),
+    h("div", {}, "or drop files here"),
+    h("div", { class: "dpw-small" }, hint));
   drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("dpw-over"); });
   drop.addEventListener("dragleave", () => drop.classList.remove("dpw-over"));
   drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("dpw-over"); read(e.dataTransfer.files); });
@@ -171,11 +210,14 @@ function detailLines(r) {
   return lines;
 }
 
-export function resultCard(name, r, bytes) {
+export function resultCard(name, r, thumb = null) {
   const c = classify(r);
+  // A three-lamp traffic light. Red and violet share the top lamp, since
+  // both mean "do not rely on this file"; the colour says which case it is.
+  const top = c.light === "violet" ? "violet" : "red";
   const signal = h("div", { class: "dpw-signal", title: LIGHTS[c.light].label },
-    ["red", "yellow", "green", "violet"].map((color) =>
-      h("div", { class: "dpw-lamp" + (color === c.light ? " dpw-on" : ""),
+    [[top, c.light === top], ["yellow", c.light === "yellow"], ["green", c.light === "green"]].map(([color, on]) =>
+      h("div", { class: "dpw-lamp" + (on ? " dpw-on" : ""),
                  style: `background:var(--${color}); --glow:var(--${color})` })));
   const body = h("div", { class: "dpw-body" },
     h("div", { class: "dpw-title", style: `color:var(--${c.light})` }, c.title),
@@ -184,7 +226,6 @@ export function resultCard(name, r, bytes) {
     h("ul", { class: "dpw-details" },
       detailLines(r).map(([k, v]) => h("li", {}, h("b", {}, k + ": "), String(v)))));
   const card = h("div", { class: "dpw-card" }, signal, body);
-  const thumb = bytes ? frameThumbnail(bytes) : null;
   if (thumb) card.appendChild(thumb);
   return card;
 }
@@ -215,36 +256,72 @@ export function frameThumbnail(bytes, target = 256) {
         if (v > pooled[i]) pooled[i] = v;
       }
     }
-    const [low, high] = quantileWindow(pooled, 0.02, 0.98);
-    const span = (high - low) || 1;
-    const lut = colormapLut("viridis");
-    const canvas = h("canvas", { class: "dpw-thumb", width: ow, height: oh });
-    const ctx = canvas.getContext("2d");
-    const img = ctx.createImageData(ow, oh);
-    for (let i = 0; i < pooled.length; i++) {
-      const t = Math.max(0, Math.min(1, (pooled[i] - low) / span));
-      const k = Math.min(255, (t * 255) | 0) * 3;
-      img.data.set([lut[k], lut[k + 1], lut[k + 2], 255], i * 4);
-    }
-    ctx.putImageData(img, 0, 0);
-    return canvas;
+    return imageCanvas(pooled, ow, oh, true);
   } catch {
     return null;
   }
 }
 
 /**
- * Display limits from the `lo` and `hi` quantiles of the measured values.
- * Negative values are masked pixels (detector gaps, dead pixels) rather than
- * measurements, so they are left out, and they render at the bottom of the
- * colour map.
+ * Display limits from the `lo` and `hi` quantiles of the values. In CBF frames
+ * negative values are masked pixels (detector gaps, dead pixels) rather than
+ * measurements, so `maskNegative` leaves them out and they render at the bottom
+ * of the colour map; in processed data they are real values.
  */
-export function quantileWindow(values, lo = 0.02, hi = 0.98) {
-  const v = Float64Array.from(values).filter((x) => Number.isFinite(x) && x >= 0).sort();
+export function quantileWindow(values, lo = 0.02, hi = 0.98, maskNegative = false) {
+  const v = Float64Array.from(values).filter((x) => Number.isFinite(x) && (!maskNegative || x >= 0)).sort();
   if (!v.length) return [0, 1];
   const at = (q) => v[Math.min(v.length - 1, Math.max(0, Math.round(q * (v.length - 1))))];
   const low = at(lo), high = at(hi);
   return [low, high > low ? high : low + 1];
+}
+
+/** Paint values (row-major, width x height) with the viridis map, scaled
+ * linearly between their 2nd and 98th percentiles. */
+export function imageCanvas(values, width, height, maskNegative = false) {
+  const [low, high] = quantileWindow(values, 0.02, 0.98, maskNegative);
+  const span = (high - low) || 1;
+  const lut = colormapLut("viridis");
+  const canvas = h("canvas", { class: "dpw-thumb", width, height });
+  const ctx = canvas.getContext("2d");
+  const img = ctx.createImageData(width, height);
+  for (let i = 0; i < values.length; i++) {
+    const t = Math.max(0, Math.min(1, (values[i] - low) / span));
+    const k = Math.min(255, (t * 255) | 0) * 3;
+    img.data.set([lut[k], lut[k + 1], lut[k + 2], 255], i * 4);
+  }
+  ctx.putImageData(img, 0, 0);
+  return canvas;
+}
+
+/** Draw the preview the Python side returns: an image, or a spectrum line. */
+export function previewCanvas(preview) {
+  if (!preview) return null;
+  const bytes = fromBase64String(preview.values);
+  const values = new Float32Array(bytes.buffer, bytes.byteOffset, bytes.length / 4);
+  if (preview.kind === "image") return imageCanvas(values, preview.width, preview.height);
+  const width = 400, height = 240;
+  const canvas = h("canvas", { class: "dpw-thumb", width, height });
+  const ctx = canvas.getContext("2d");
+  const [low, high] = quantileWindow(values, 0, 1);
+  const span = (high - low) || 1;
+  ctx.fillStyle = "#1c1917";
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeStyle = "#51cf66";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  values.forEach((v, i) => {
+    const x = (i / Math.max(1, values.length - 1)) * (width - 16) + 8;
+    const y = height - 8 - ((v - low) / span) * (height - 16);
+    if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+  });
+  ctx.stroke();
+  return canvas;
+}
+
+/** A one-line progress message that a later result replaces. */
+export function statusLine(text) {
+  return h("div", { class: "dpw-small", style: "margin-top:12px" }, text);
 }
 
 export function fromBase64String(b64) {

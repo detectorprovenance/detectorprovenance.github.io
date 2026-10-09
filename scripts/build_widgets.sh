@@ -5,7 +5,8 @@
 #     scripts/build_widgets.sh --sync     # first refresh widgets/framesig/ from Frame_validation
 #
 # widgets/framesig/ is a copy of Frame_validation's browser implementation
-# (web/framesig/), so the site builds without access to that repository. The
+# (web/framesig/), and widgets/py/ holds its Python package as a wheel, so the
+# site builds without access to that repository. The
 # demo keys and sample files in demo/ come from Frame_validation's
 # tools/make_site_demo.py. Set FRAMESIG_REPO if Frame_validation is not
 # checked out next to this repository.
@@ -25,11 +26,16 @@ if [ "${1:-}" = "--sync" ]; then
     if [ -n "$changes" ]; then echo "The copy included uncommitted changes:"; echo "$changes"; fi
   } > widgets/framesig/SOURCE.txt
   echo "synced widgets/framesig/ from $SRC ($commit)"
+  # The Python reference implementation, as a wheel, for the HDF5 path (python.js).
+  rm -f widgets/py/framesig-*.whl
+  python3 -m pip wheel -q --no-deps -w widgets/py "$SRC"
+  echo "built widgets/py/$(cd widgets/py && ls framesig-*.whl)"
 fi
 
 for w in verify-demo sign-demo; do
   npx --yes esbuild@0.24.0 "widgets/src/$w.js" --bundle --format=esm --target=es2020 \
-    --loader:.pem=text --loader:.cbf=base64 --legal-comments=none \
+    --loader:.pem=text --loader:.cbf=base64 --loader:.hspy=base64 --loader:.whl=base64 --loader:.py=text \
+    --legal-comments=none \
     --banner:js="// Built by scripts/build_widgets.sh from widgets/src/$w.js. Do not edit." \
     --outfile="widgets/$w.js" --log-level=warning
   echo "built widgets/$w.js ($(wc -c < "widgets/$w.js" | tr -d ' ') bytes)"
