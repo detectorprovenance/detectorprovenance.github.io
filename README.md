@@ -32,6 +32,7 @@ The workflow serves the site from the domain root if the repository is named `de
 
 - `index.md`: landing page
 - `threat-model.md`, `how-it-works.md`, `assurance.md`, `manufacturers.md`, `status.md`: overview pages
+- `demo.md`, `demo-vendor/`: the demo vendor page and the files it serves (certificates, signed revocation lists, signed frames and runs). The deploy workflow copies `demo-vendor/` into the built site, because MyST publishes only pages and the files they reference. The lists expire in October 2027; regenerate before then with `tools/make_demo_vendor.py` from the reference implementation. The certificates name `https://detectorprovenance.github.io/demo-vendor/`, so the demo works only from the domain root
 - `myst.yml`: site config, abbreviations, and table of contents
 - `style.css`: theme overrides for the MyST book-theme, including the search bar in light and dark mode
 - `scripts/patch_theme.py`: theme patch (flat top-bar search)

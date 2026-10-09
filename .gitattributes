@@ -1,0 +1,2 @@
+# Signed files must reach the site byte for byte: no line-ending conversion.
+demo-vendor/** -text

@@ -36,6 +36,7 @@ project:
     - file: how-it-works.md
     - file: assurance.md
     - file: manufacturers.md
+    - file: demo.md
     - file: status.md
 site:
   template: book-theme

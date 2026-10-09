@@ -38,6 +38,10 @@ jobs:
           myst build --html
         env:
           REPO: ${{ github.event.repository.name }}
+      # MyST publishes only pages and the files they reference, so the demo
+      # vendor's certificates, lists and data are copied in as static files.
+      - name: Add the demo vendor files
+        run: cp -r demo-vendor _build/html/demo-vendor
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _build/html
