@@ -90,4 +90,4 @@ These frames carry no timestamp from a trusted authority. The verifier therefore
 
 - A real vendor's revocation lists would be valid for a few days and re-signed continuously. The demo lists are valid for one year so that the demo keeps working without a signing service. They are regenerated before they expire.
 - Every certificate in the demo is a test certificate, and the demo private keys are kept outside this repository. Data signed by this vendor reaches the `custodial` assurance level at most, and never `instrument`.
-- The [browser verifier](how-it-works.md) does not yet check revocation, so it reports both units identically. It does detect the tampered run.
+- The [browser verifier](demonstration/verify.md) does not yet check revocation, so it reports the signed frames of both units identically. The copy on this site does not yet read runs packed into HDF5, so the runs, including the tampered one, need the command-line verifier.
