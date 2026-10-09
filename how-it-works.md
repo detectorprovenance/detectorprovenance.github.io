@@ -28,7 +28,8 @@ For each frame, the signer records a manifest that contains:
 - a digest of the metadata, such as wavelength, detector distance, and beam center;
 - digests of the pixel data, both as stored and as decoded values;
 - optional claims, such as the beamline or proposal number;
-- an acquisition attestation from the detector, which records the serial number, model, firmware, sensor, and acquisition mode.
+- an acquisition attestation from the detector, which records the serial number, model, firmware, sensor, and acquisition mode;
+- the name, version, and source revision of the software that signed the frame, so that every frame signed by a given build can be found later.
 
 The acquisition mode is one of `physical`, `test-pattern`, `calibration`, or `simulated`. Frames from non-physical modes can still be signed, but they cannot reach the highest assurance level, which prevents a detector from being used to sign a test pattern that is later presented as a measurement.
 
@@ -41,6 +42,8 @@ Signing the metadata together with the pixel data also protects against ordinary
 A secure element requires tens of milliseconds per signature, which limits per-frame signing to approximately 10 frames per second, while modern detectors record hundreds to thousands of frames per second. We therefore compute a digest for every frame as it is written, combine the digests into a Merkle tree, and sign only the root of the tree, once per run or every few seconds during a long run. Each frame stores a short proof of its position in the tree, with a size that grows logarithmically with the number of frames, so each frame remains individually verifiable offline. Because the tree records the order of the frames, a verifier can also detect frames that were removed, duplicated, or reordered, which per-frame signatures cannot detect.
 
 We measured the effect of this design using a TPM on a standard Windows computer. Signing six frames individually took 8.1 s, while signing the same six frames as one run took 2.3 s, because the run required a single TPM operation regardless of the number of frames.
+
+A run can also be stored as a single HDF5 file in the layout that NeXus readers expect, a stack of frames together with the signed frame records and the one run signature. HDF5 files are not byte-for-byte reproducible, so the signature covers the decoded pixel values and metadata of each frame rather than the bytes of the file, and the verifier still reports each frame separately. Before reading any pixel, the verifier rejects any content that the signature does not cover, such as an additional dataset, a link to another file, or a compression filter that would load external code. Because the work for each frame is independent, it runs on all processor cores while the run is still signed once. For frames from a 6-megapixel detector, packing a run on one workstation took 0.36 s per frame on one core and 0.08 s per frame on twelve cores, so a run of 3600 frames takes about five minutes.
 
 ## Verification
 

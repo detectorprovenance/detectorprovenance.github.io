@@ -5,7 +5,7 @@ This page describes the state of the project as of October 2026. The reference i
 ## Current infrastructure
 
 - **A specification** for signed frames, signed runs, and signed datasets, written so that it can be implemented without reading our code.
-- **A reference implementation in Python** that signs and verifies data, with support for CBF/imgCIF files and a generic adapter for any other file. It supports Ed25519 and ECDSA P-256 signatures, test certificate authorities with chain validation, signing of complete runs using Merkle trees, the three-layer key hierarchy, signed dataset bundles, RFC 3161 timestamps, and revocation lists.
+- **A reference implementation in Python** that signs and verifies data, with support for CBF/imgCIF files and a generic adapter for any other file. It supports Ed25519 and ECDSA P-256 signatures, test certificate authorities with chain validation, signing of complete runs using Merkle trees, runs packed into a single HDF5 file and verified frame by frame, the three-layer key hierarchy, signed dataset bundles, RFC 3161 timestamps, and revocation lists.
 - **Hardware-backed signing** with keys that cannot be exported, using the TPM on Windows and Linux and the Secure Enclave on macOS. These computers stand in for the secure element of a detector, and use the same code path.
 - **An independent verifier that runs in a web browser** with no dependencies, which reads files locally and never uploads them. It does not yet check timestamps or revocation.
 - **A desktop viewer and a browser viewer** that display each frame together with its verification result.
@@ -15,7 +15,7 @@ This page describes the state of the project as of October 2026. The reference i
 
 - **Detector support.** No detector currently signs data in hardware, and every certificate in our demonstrations comes from a test CA that we create. The scheme provides evidence of origin only once a key is held inside a detector, as described in [Manufacturer requirements](manufacturers.md).
 - **A permanent namespace for the policy identifiers.** The identifiers need to be registered by a neutral organization before any detector ships with this capability.
-- **A NeXus/HDF5 adapter**, which would extend format-specific support to electron microscopy data such as 4D-STEM datasets and spectrum images.
+- **A NeXus/HDF5 adapter for detector output.** Runs can already be packed into one HDF5 file and verified, but signing HDF5 files as a detector writes them would extend format-specific support to electron microscopy data such as 4D-STEM datasets and spectrum images.
 - **Signatures for processed data.** Processing steps such as integration, reconstruction, or background subtraction should extend the record of provenance instead of breaking it. This is designed but not built.
 - **Support for hardware security modules (HSMs) and security keys**, through a PKCS#11 interface, which a facility signing service would need.
 - **A transparency log**, without which a timestamp still depends on trusting the timestamping authority not to backdate it.
