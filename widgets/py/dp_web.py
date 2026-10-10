@@ -22,6 +22,7 @@ from framesig.hdf5_tree import is_signed_hdf5, sign_hdf5, verify_hdf5
 from framesig import zarr_tree
 from framesig.keys import ALG_ECDSA_P256, SoftwareSigner, generate_private_key
 from framesig.pki import load_certificates_pem
+from framesig.run_h5 import RUN_SPEC, verify_run
 
 PREVIEW = 256
 _FRESH = None
@@ -87,9 +88,48 @@ def _main_array(path):
         return preview(h[max(best)[1]])
 
 
+def _is_run(path):
+    """A Run-HDF5 (SPEC §7.2): a whole run signed once, not a file signed in place."""
+    import h5py
+
+    try:
+        with h5py.File(path, "r") as h:
+            return "framesig" in h and h["framesig"].attrs.get("spec") == RUN_SPEC
+    except (OSError, KeyError, ValueError, TypeError):
+        return False
+
+
+def _run_result(path, roots):
+    """verify_run's report in the shape _result_dict gives the widgets.
+
+    A run carries no assurance level of its own, so a run whose signer is
+    trusted shows at most as custodial: never more than the evidence holds.
+    """
+    r = verify_run(path, roots=roots)
+    bad = [f for f in r["frames"] if f["status"] != "repackaged"]
+    problems = list(r["problems"])
+    if bad:
+        problems.insert(0, f"{len(bad)} of {len(r['frames'])} frame(s) differ from what was signed: "
+                        + ", ".join(f"frame {f['index']} ({'; '.join(f['problems']) or f['status']})"
+                                    for f in bad[:3]))
+    trust = r["trust"] or {}
+    series = r["series"] or {}
+    return {
+        "status": r["status"],
+        "signatureValid": r["signature_valid"],
+        "trustStatus": trust.get("status"),
+        "assurance": {"level": "custodial" if r["ok"] else "none", "mode": None, "instrument": {}},
+        "manifest": {"signer": series.get("signer") or {}, "created": series.get("created")},
+        "problems": problems + list(trust.get("problems", [])),
+        "notes": list(trust.get("notes", [])),
+    }
+
+
 def _verify(path, roots_pem):
     roots = load_certificates_pem(roots_pem.encode())
-    if not is_signed_hdf5(path):
+    if _is_run(path):
+        r = _run_result(path, roots)
+    elif not is_signed_hdf5(path):
         r = {"status": "unsigned", "assurance": {"level": "none"}, "manifest": None,
              "problems": ["no signature found: the file has no /framesig group"]}
     else:
