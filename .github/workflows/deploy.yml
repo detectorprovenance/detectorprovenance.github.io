@@ -21,9 +21,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
       - name: Install MyST
-        run: npm install -g mystmd
+        # Pinned with book-theme v1.4.1 (myst.yml): scripts/patch_theme.py
+        # edits that theme's bundles, and book-theme v2 moved them.
+        run: npm install -g mystmd@1.11.0
       - name: Fetch the site template
         run: myst build
       - name: Patch theme (flat search)

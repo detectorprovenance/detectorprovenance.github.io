@@ -18,9 +18,22 @@ import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-THEME = os.path.normpath(
-    os.path.join(HERE, "..", "_build", "templates", "site", "myst", "book-theme")
-)
+ROOT = os.path.normpath(os.path.join(HERE, ".."))
+
+
+def _theme_dir():
+    """Where myst saved the site template. A template given by URL in
+    myst.yml (the pinned book-theme zip) lands in a folder named by the
+    sha256 of the URL; a template given by name lands under its name."""
+    with open(os.path.join(ROOT, "myst.yml")) as f:
+        m = re.search(r"^\s*template:\s*(https?://\S+)\s*$", f.read(), re.M)
+    site = os.path.join(ROOT, "_build", "templates", "site")
+    if m:
+        return os.path.join(site, hashlib.sha256(m.group(1).encode()).hexdigest())
+    return os.path.join(site, "myst", "book-theme")
+
+
+THEME = _theme_dir()
 
 # Flat top-bar search runtime (replaces the theme's dialog search).
 # Injected into the server-rendered HTML. The search index path is
@@ -271,7 +284,7 @@ def toc_patched(src):
 
 def main():
     if not os.path.isdir(THEME):
-        sys.exit("book-theme template not found; run `myst build` first")
+        sys.exit(f"book-theme template not found at {THEME}; run `myst build` first")
     total = 0
     # dev server: drop the 1-year immutable cache so patched bundles reload
     server_js = os.path.join(THEME, "server.js")

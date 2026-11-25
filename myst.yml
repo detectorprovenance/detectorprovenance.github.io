@@ -43,7 +43,9 @@ project:
     - file: demo.md
     - file: status.md
 site:
-  template: book-theme
+  # book-theme v1.4.1, pinned: v2 (Nov 2026) changed the bundle layout that
+  # scripts/patch_theme.py edits. Update both together.
+  template: https://github.com/myst-templates/book-theme/archive/23f2df5493e23dfb1d9433c8aa64c87beb4232a3.zip
   title: Detector Provenance
   options:
     # Custom theming, see ./style.css
